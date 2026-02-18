@@ -89,8 +89,8 @@ export interface Community {
 export interface LiveSignals {
   health: Record<string, unknown> | null;
   vectorize: Record<string, unknown> | null;
+  vectorize_progress: Record<string, unknown> | null;
   scan: Record<string, unknown> | null;
-  recheck: Record<string, unknown> | null;
 }
 
 export interface SignalMessage {
@@ -107,11 +107,12 @@ export interface HealthSignalData {
   health: string;
 }
 
-export interface RecheckProgressData {
+export interface VectorizeProgressData {
   timestamp: number;
-  checked: number;
+  vec_stage: string;
+  stage_progress: number;
+  stage_total: number;
   flagged: number;
-  total: number;
-  page: number;
+  embedded: number;
   duration_seconds: number;
 }

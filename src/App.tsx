@@ -12,7 +12,7 @@ import type {
   LiveSignals,
   SignalMessage,
   HealthSignalData,
-  RecheckProgressData,
+  VectorizeProgressData,
 } from "./types";
 import HealthBanner from "./components/HealthBanner";
 import StatsCards from "./components/StatsCards";
@@ -27,13 +27,13 @@ export default function App() {
   const [selectedCluster, setSelectedCluster] = useState<number | null>(null);
   const [liveHealth, setLiveHealth] = useState<HealthSignalData | null>(null);
   const [lastSignalTs, setLastSignalTs] = useState<Record<string, number>>({});
-  const [recheckProgress, setRecheckProgress] = useState<RecheckProgressData | null>(null);
+  const [vecProgress, setVecProgress] = useState<VectorizeProgressData | null>(null);
 
-  // Seed recheck state from /live on initial load
+  // Seed vectorize progress from /live on initial load
   useEffect(() => {
     fetchApi<LiveSignals>("/api/v1/live").then((live) => {
-      if (live?.recheck && (live.recheck as Record<string, unknown>).total) {
-        setRecheckProgress(live.recheck as unknown as RecheckProgressData);
+      if (live?.vectorize_progress && (live.vectorize_progress as Record<string, unknown>).vec_stage) {
+        setVecProgress(live.vectorize_progress as unknown as VectorizeProgressData);
       }
     }).catch(() => {});
   }, []);
@@ -59,14 +59,12 @@ export default function App() {
         setLiveHealth(msg.data as unknown as HealthSignalData);
       }
 
-      if (msg.signal === "recheck.progress") {
-        setRecheckProgress(msg.data as unknown as RecheckProgressData);
-      }
-
-      if (msg.signal === "recheck.complete") {
-        const d = msg.data as unknown as RecheckProgressData;
-        setRecheckProgress({ ...d, checked: d.total || d.checked, page: d.page ?? 0 });
-        setTimeout(() => setRecheckProgress(null), 3000);
+      if (msg.signal === "vectorize.progress") {
+        const d = msg.data as unknown as VectorizeProgressData;
+        setVecProgress(d);
+        if (d.vec_stage === "done") {
+          setTimeout(() => setVecProgress(null), 3000);
+        }
       }
 
       // Trigger a quiet REST refetch on pipeline events
@@ -103,7 +101,7 @@ export default function App() {
 
       <HealthBanner health={liveHealth?.health ?? stats?.health ?? null} wsConnected={wsConnected} signalTs={lastSignalTs} />
 
-      <ActivityProgress recheckProgress={recheckProgress} />
+      <ActivityProgress progress={vecProgress} />
 
       {stats && <StatsCards stats={stats} liveHealth={liveHealth} />}
 
