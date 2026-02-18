@@ -1,6 +1,7 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useApi } from "./hooks/useApi";
 import { useSignals } from "./hooks/useSignals";
+import { fetchApi } from "./api";
 import type {
   PipelineStats,
   PipelineFunnel,
@@ -8,8 +9,10 @@ import type {
   TopicCluster,
   TrendSummary,
   Community,
+  LiveSignals,
   SignalMessage,
   HealthSignalData,
+  RecheckProgressData,
 } from "./types";
 import HealthBanner from "./components/HealthBanner";
 import StatsCards from "./components/StatsCards";
@@ -18,11 +21,22 @@ import ClusterChart from "./components/ClusterChart";
 import ClusterTrends from "./components/ClusterTrends";
 import TrendsPanel from "./components/TrendsPanel";
 import CommunitiesGrid from "./components/CommunitiesGrid";
+import ActivityProgress from "./components/ActivityProgress";
 
 export default function App() {
   const [selectedCluster, setSelectedCluster] = useState<number | null>(null);
   const [liveHealth, setLiveHealth] = useState<HealthSignalData | null>(null);
   const [lastSignalTs, setLastSignalTs] = useState<Record<string, number>>({});
+  const [recheckProgress, setRecheckProgress] = useState<RecheckProgressData | null>(null);
+
+  // Seed recheck state from /live on initial load
+  useEffect(() => {
+    fetchApi<LiveSignals>("/api/v1/live").then((live) => {
+      if (live?.recheck && (live.recheck as Record<string, unknown>).total) {
+        setRecheckProgress(live.recheck as unknown as RecheckProgressData);
+      }
+    }).catch(() => {});
+  }, []);
 
   const { data: stats, error: statsErr, refetch: refetchStats } = useApi<PipelineStats>("/api/v1/stats", 30_000);
   const { data: funnel } = useApi<PipelineFunnel>("/api/v1/funnel", 60_000);
@@ -43,6 +57,16 @@ export default function App() {
 
       if (msg.signal === "health.check") {
         setLiveHealth(msg.data as unknown as HealthSignalData);
+      }
+
+      if (msg.signal === "recheck.progress") {
+        setRecheckProgress(msg.data as unknown as RecheckProgressData);
+      }
+
+      if (msg.signal === "recheck.complete") {
+        const d = msg.data as unknown as RecheckProgressData;
+        setRecheckProgress({ ...d, checked: d.total || d.checked, page: d.page ?? 0 });
+        setTimeout(() => setRecheckProgress(null), 3000);
       }
 
       // Trigger a quiet REST refetch on pipeline events
@@ -78,6 +102,8 @@ export default function App() {
       )}
 
       <HealthBanner health={liveHealth?.health ?? stats?.health ?? null} wsConnected={wsConnected} signalTs={lastSignalTs} />
+
+      <ActivityProgress recheckProgress={recheckProgress} />
 
       {stats && <StatsCards stats={stats} liveHealth={liveHealth} />}
 

@@ -8,7 +8,7 @@ export function useSignals(onSignal: SignalHandler) {
   const handlerRef = useRef(onSignal);
   handlerRef.current = onSignal;
 
-  const reconnectDelay = useRef(1000);
+  const reconnectDelay = useRef(500);
   const wsRef = useRef<WebSocket | null>(null);
   const mountedRef = useRef(true);
 
@@ -25,7 +25,7 @@ export function useSignals(onSignal: SignalHandler) {
     ws.onopen = () => {
       if (!mountedRef.current) return;
       setConnected(true);
-      reconnectDelay.current = 1000;
+      reconnectDelay.current = 500;
     };
 
     ws.onmessage = (ev) => {
@@ -41,7 +41,7 @@ export function useSignals(onSignal: SignalHandler) {
       if (!mountedRef.current) return;
       setConnected(false);
       const delay = reconnectDelay.current;
-      reconnectDelay.current = Math.min(delay * 2, 30_000);
+      reconnectDelay.current = Math.min(delay * 2, 5_000);
       setTimeout(connect, delay);
     };
 

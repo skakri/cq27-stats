@@ -90,6 +90,7 @@ export interface LiveSignals {
   health: Record<string, unknown> | null;
   vectorize: Record<string, unknown> | null;
   scan: Record<string, unknown> | null;
+  recheck: Record<string, unknown> | null;
 }
 
 export interface SignalMessage {
@@ -104,4 +105,13 @@ export interface HealthSignalData {
   embedded: number;
   pending: number;
   health: string;
+}
+
+export interface RecheckProgressData {
+  timestamp: number;
+  checked: number;
+  flagged: number;
+  total: number;
+  page: number;
+  duration_seconds: number;
 }
