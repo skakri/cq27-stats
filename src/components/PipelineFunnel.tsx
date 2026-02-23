@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { PipelineFunnel as FunnelType, FlaggedSample } from "../types";
+import { fmtNum } from "../format";
 
 const STAGE_COLORS = [
   "bg-blue-500",
@@ -33,7 +34,7 @@ export default function PipelineFunnel({ funnel }: { funnel: FunnelType }) {
                   style={{ width: `${width}%` }}
                 />
                 <div className="absolute inset-0 flex items-center pl-2">
-                  <span className="text-xs font-bold text-white drop-shadow">{stage.count.toLocaleString()}</span>
+                  <span className="text-xs font-bold text-white drop-shadow">{fmtNum(stage.count)}</span>
                 </div>
               </div>
               <div className="w-16 shrink-0 text-right text-xs text-gray-500">

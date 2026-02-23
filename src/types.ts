@@ -14,7 +14,8 @@ export interface BackendStats {
   posts: number;
   comments: number;
   scans?: number;
-  items_found?: number;
+  items_seen?: number;
+  items_collected?: number;
   errors?: number;
 }
 
@@ -42,6 +43,8 @@ export interface TopicCluster {
   label: string;
   description: string | null;
   member_count: number;
+  quality_score: number;
+  velocity: number;
   created_at: string;
   updated_at: string;
 }
@@ -72,6 +75,7 @@ export interface TrendEntry {
   arrow?: string;
   growth_rate?: number;
   member_count?: number;
+  quality_score?: number;
   cluster_id?: number;
 }
 
@@ -105,6 +109,19 @@ export interface HealthSignalData {
   embedded: number;
   pending: number;
   health: string;
+}
+
+export interface ClusterGraphNode {
+  id: number;
+  label: string;
+  member_count: number;
+  quality_score: number;
+  description: string | null;
+  centroid: number[] | null;
+}
+
+export interface ClusterGraphResponse {
+  nodes: ClusterGraphNode[];
 }
 
 export interface VectorizeProgressData {

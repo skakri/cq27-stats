@@ -1,4 +1,5 @@
 import type { VectorizeProgressData } from "../types";
+import { fmtNum } from "../format";
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${Math.round(seconds)}s`;
@@ -56,19 +57,19 @@ export default function ActivityProgress({ progress }: Props) {
 
       <div className="flex items-center justify-between text-xs text-gray-500">
         <span>
-          <span className="text-gray-300">{stage_progress.toLocaleString()}</span>
+          <span className="text-gray-300">{fmtNum(stage_progress)}</span>
           {" / "}
-          <span className="text-gray-300">{stage_total.toLocaleString()}</span>
+          <span className="text-gray-300">{fmtNum(stage_total)}</span>
         </span>
         {flagged > 0 && (
           <span>
-            <span className="text-yellow-400">{flagged.toLocaleString()}</span>
+            <span className="text-yellow-400">{fmtNum(flagged)}</span>
             {" flagged"}
           </span>
         )}
         {embedded > 0 && (
           <span>
-            <span className="text-emerald-400">{embedded.toLocaleString()}</span>
+            <span className="text-emerald-400">{fmtNum(embedded)}</span>
             {" embedded"}
           </span>
         )}
