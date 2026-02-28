@@ -13,10 +13,9 @@ export interface PipelineStats {
 export interface BackendStats {
   posts: number;
   comments: number;
-  scans?: number;
-  items_seen?: number;
-  items_collected?: number;
-  errors?: number;
+  last_1h: number;
+  last_6h: number;
+  last_24h: number;
 }
 
 export interface FunnelStage {

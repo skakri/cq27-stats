@@ -50,12 +50,11 @@ export default function StatsCards({ stats, liveHealth }: Props) {
               <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
                 <span>{fmtNum(b.posts)} posts</span>
                 <span>{fmtNum(b.comments)} comments</span>
-                {b.scans != null && <span>{fmtNum(b.scans)} scans</span>}
-                {b.items_seen != null && <span>{fmtNum(b.items_seen)} seen</span>}
-                {b.items_collected != null && <span>{fmtNum(b.items_collected)} collected</span>}
-                {b.errors != null && b.errors > 0 && (
-                  <span className="text-red-400">{b.errors} errors</span>
-                )}
+              </div>
+              <div className="mt-1.5 flex gap-3 text-xs text-gray-500">
+                <span>1h: {fmtNum(b.last_1h)} ({fmtNum(b.last_1h)}/h)</span>
+                <span>6h: {fmtNum(b.last_6h)} ({fmtNum(Math.round(b.last_6h / 6))}/h)</span>
+                <span>24h: {fmtNum(b.last_24h)} ({fmtNum(Math.round(b.last_24h / 24))}/h)</span>
               </div>
             </div>
           ))}
